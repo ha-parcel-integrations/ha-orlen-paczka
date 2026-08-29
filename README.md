@@ -35,6 +35,7 @@ Part of the [ha-parcel-integrations](https://github.com/ha-parcel-integrations) 
 - Track any number of ORLEN Paczka parcels by tracking code — no account needed
 - Per-parcel sensor with the canonical status (`registered` / `in_transit` / `out_for_delivery` / `delivered` / …) and the carrier's own status text
 - Summary sensors: incoming parcels, next delivery, recently delivered parcels
+- Read-only **Deliveries** calendar with the expected delivery windows
 - `orlen_paczka.track_parcel` / `orlen_paczka.untrack_parcel` services, so a dashboard button can add a parcel
 - Events + device triggers for no-code automations (parcel registered, status changed, delivered, delivery time changed)
 - Opt-in per-parcel status history
@@ -42,7 +43,7 @@ Part of the [ha-parcel-integrations](https://github.com/ha-parcel-integrations) 
 
 ## Requirements
 
-- Home Assistant 2024.7 or newer
+- Home Assistant 2024.12 or newer
 - An ORLEN Paczka parcel and its tracking code (from the shipping
   confirmation email or the missed-delivery card) — no account needed
 
