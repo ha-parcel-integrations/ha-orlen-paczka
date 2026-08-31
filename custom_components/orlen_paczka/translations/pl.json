@@ -13,7 +13,7 @@
     "step": {
       "init": {"title": "Opcje ORLEN Paczka", "menu_options": {"parcels": "Przesyłki", "settings": "Ustawienia"}, "sections": {"parcels": {"name": "Przesyłki", "data": {"add": "Dodaj przesyłkę", "remove": "Usuń przesyłki"}, "data_description": {"add": "Wprowadź numer przesyłki ORLEN Paczka."}}, "delivered": {"name": "Doręczone przesyłki", "data": {"delivered_filter_type": "Filtruj według", "delivered_filter_amount": "Liczba"}, "data_description": {"delivered_filter_type": "Pokaż przesyłki z ostatnich X dni lub X najnowszych.", "delivered_filter_amount": "Liczba dni lub przesyłek."}}, "history": {"name": "Historia przesyłki", "data": {"include_history": "Uwzględnij historię statusów"}, "data_description": {"include_history": "Dodaje historię statusów do atrybutów przesyłki."}}}},
       "parcels": {"title": "Zarządzaj przesyłkami", "data": {"tracking_codes": "Numery przesyłek"}},
-      "settings": {"title": "Ustawienia", "data": {"delivered_filter_type": "Doręczone przesyłki: filtruj według", "delivered_filter_amount": "Doręczone przesyłki: liczba", "include_history": "Uwzględnij historię przesyłki"}}
+      "settings": {"title": "Ustawienia", "data": {"delivered_filter_type": "Doręczone przesyłki: filtruj według", "delivered_filter_amount": "Doręczone przesyłki: liczba", "include_history": "Uwzględnij historię statusu"}}
     },
     "error": {"invalid_tracking_code": "To nie wygląda na numer przesyłki ORLEN Paczka.", "allegro_delivery": "Numery Allegro Delivery zaczynające się od AD należy śledzić w Allegro, a nie w ORLEN Paczka.", "already_tracked": "Ta przesyłka jest już śledzona."}
   },
