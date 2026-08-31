@@ -49,6 +49,21 @@ endpoints or payload details into this public repository.
   `Europe/Warsaw`. ETA, structured pickup point, sender/receiver, weight,
   dimensions and URL are intentionally `None`; `CAPABILITIES` contains only
   opt-in history.
+- **Allegro Delivery (`AD…` codes) is out of scope.** ORLEN's own tracking
+  page refers those to Allegro; `config_flow.py` rejects an `AD`-prefixed
+  code with a message pointing the user there rather than forwarding it to
+  ORLEN's endpoint (which answers `err: 1003` for every `AD…` code tried).
+  `err: 1003` is otherwise handled defensively — ORLEN may introduce another
+  code family that reaches this endpoint.
+- **`return`/`returnTruck` are not yet mapped to `returning`.** No return
+  payload has been captured, so both fields are only retained in `raw` and
+  fire a one-shot warning the first time they appear non-empty — a
+  status-map row needs real return-response evidence before the lifecycle
+  changes.
+- **Read-only by design.** This integration only tracks; it never submits or
+  modifies an ORLEN sender/return workflow, and it never scrapes the public
+  tracking HTML or parses `historyHtml` — the JSONP payload is the only data
+  source.
 
 ## Options and reloads
 
