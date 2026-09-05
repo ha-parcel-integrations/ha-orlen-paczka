@@ -54,8 +54,7 @@ CAPABILITIES = frozenset({"history"})
 # preemptively: a single-backend carrier (the common case) keeps the flat
 # CAPABILITIES above.
 
-# The public tracker has no authentication and emits JSONP. Full request and
-# response mechanics live in the private carrier-research repository.
+# The public tracker has no authentication and emits JSONP.
 TRACKING_API_URL = "https://nadaj.orlenpaczka.pl/parcel/api-status"
 
 # Tracked parcels live in the config entry options as a list of
