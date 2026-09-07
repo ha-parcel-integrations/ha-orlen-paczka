@@ -1,6 +1,9 @@
 {
   "name": "ORLEN Paczka",
   "content_in_root": false,
+  "zip_release": true,
+  "filename": "orlen_paczka.zip",
+  "hide_default_branch": true,
   "render_readme": true,
   "homeassistant": "2024.12.0"
 }
