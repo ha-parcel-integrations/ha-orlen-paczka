@@ -30,9 +30,6 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-_TRACKING_CODE_RE = re.compile(r"^(?:[23][0-9]{12}|[0-9]{7}|[0-9]{10})$")
-
-
 def normalize_tracking_code(value: str) -> str:
     """Return the tracking code upper-cased with separators stripped.
 
@@ -43,8 +40,13 @@ def normalize_tracking_code(value: str) -> str:
 
 
 def valid_tracking_code(value: str) -> bool:
-    """Whether ``value`` looks like an ORLEN Paczka tracking code."""
-    return bool(_TRACKING_CODE_RE.match(value))
+    """Accept every non-empty code.
+
+    Carriers' real tracking-number formats vary too much and differ from any
+    one guessed shape, and an invalid code just comes back "not found" from
+    the API anyway.
+    """
+    return bool(value)
 
 
 def _current_parcels(entry: ConfigEntry) -> list[dict[str, str]]:
