@@ -54,7 +54,12 @@ _STATUS_MAP: dict[str, ParcelStatus] = {
 
 CARRIER_TZ = ZoneInfo("Europe/Warsaw")
 _PICKUP_LABEL = "czeka na odbiór w punkcie"
-_IN_OTHER_COUNTRY_LABEL = "paczka w innym kraju"
+# Code 690 carries the "ready for collection" category even when the parcel was
+# handed to a carrier abroad; only the sentence tells the two apart.
+_HANDOFF_LABELS = (
+    "paczka w innym kraju",
+    "przekazana do przewoźnika w innym kraju",
+)
 _unmapped_statuses_logged: set[str] = set()
 _shape_warnings_logged: set[str] = set()
 
@@ -90,7 +95,9 @@ def _map_status(code: Any, label: Any = None) -> ParcelStatus | None:
     if code == "690":
         if isinstance(label, str) and _PICKUP_LABEL in label.lower():
             return ParcelStatus.AT_PICKUP_POINT
-        if isinstance(label, str) and _IN_OTHER_COUNTRY_LABEL in label.lower():
+        if isinstance(label, str) and any(
+            handoff in label.lower() for handoff in _HANDOFF_LABELS
+        ):
             return ParcelStatus.IN_TRANSIT
         return None
     return _STATUS_MAP.get(code)
@@ -237,11 +244,20 @@ def normalize_parcel(raw: dict, *, include_history: bool = False) -> dict:
     delivered_at = to_iso_timestamp(latest.get("date")) if delivered else None
     safe_raw = {key: value for key, value in raw.items() if key != "historyHtml"}
 
-    if raw.get("_orlen_error") == "1003":
+    error = raw.get("_orlen_error")
+    if error == "1003":
         _warn_shape_once(
             "unsupported_1003",
             "ORLEN Paczka returned err=1003 for a configured code. It may be "
             "Allegro Delivery; retain it as unknown and report this: %s",
+            NEW_ISSUE_URL,
+        )
+    elif error == "1004":
+        _warn_shape_once(
+            "untrackable_1004",
+            "ORLEN Paczka returned err=1004 for a configured code, meaning it "
+            "cannot be tracked; keeping it as unknown. Report this if the "
+            "parcel should be trackable: %s",
             NEW_ISSUE_URL,
         )
     if raw.get("return") is True or raw.get("returnTruck") not in (None, "Brak danych"):
@@ -256,7 +272,7 @@ def normalize_parcel(raw: dict, *, include_history: bool = False) -> dict:
 
     unknown_keys = set(raw) - {
         "status", "number", "full", "history", "label", "return", "truckNo",
-        "returnTruck", "historyHtml", "err",
+        "returnTruck", "historyHtml", "err", "_orlen_error",
     }
     if unknown_keys:
         _warn_shape_once(
