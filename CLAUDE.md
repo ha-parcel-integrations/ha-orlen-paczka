@@ -47,9 +47,21 @@ endpoints or payload details into this public repository.
   a normal pending parcel, not an error; retain it for later polling.
 - `history[]` is the source of truth. Ignore `historyHtml`: it disagreed with
   structured history in a live response and must not enter diagnostics.
-- `690` is only `at_pickup_point` when its full Polish label explicitly says
-  that the parcel waits for collection. Otherwise it is `unknown`; `1000` is
-  the sole observed terminal collection code.
+- `690` is decided by its full Polish label, never by the code or the short
+  category alone: ORLEN gives a parcel it hands to a carrier in another country
+  the same code and "ready for collection" category as one waiting at a point.
+  A label saying the parcel waits for collection is `at_pickup_point`; a label
+  saying it was handed over to a carrier in another country is `in_transit`
+  (two wordings of that handoff are matched);
+  anything else is `unknown` plus the one-shot WARNING. `1000` is the sole
+  observed terminal collection code.
+- **`err: 1004` is not a status and not a failure.** It means ORLEN's tracker
+  will not track that number, without saying the parcel does not exist. Like
+  `1003`, it is kept as an `unknown` placeholder with a one-shot WARNING
+  instead of failing the refresh (which would drop the parcel, or fail setup
+  if it is the only one). `full: false` is reported to mean ORLEN returned only
+  the newest scan: status is unaffected and history is merely partial, so no
+  code reads it.
 - ORLEN timestamps are naive Poland-local values and are parsed as
   `Europe/Warsaw`. ETA, structured pickup point, sender/receiver, weight,
   dimensions and URL are intentionally `None`; `CAPABILITIES` contains only

@@ -121,7 +121,7 @@ The `status` field is the carrier-agnostic enum shared by the whole integration 
 | Status | Meaning |
 |---|---|
 | `registered` | Announced / received by ORLEN Paczka |
-| `in_transit` | In the sorting network |
+| `in_transit` | In the sorting network, or handed over to a carrier in another country |
 | `out_for_delivery` | On its way to a pickup point |
 | `at_pickup_point` | Waiting for you at a pickup location |
 | `delivered` | Collected from the pickup location |
@@ -170,6 +170,7 @@ logger:
 ## Troubleshooting
 
 - **A parcel shows `unknown`** — ORLEN Paczka has not yet published data for the code, or it reported a status the integration has not mapped. It will update automatically on the next poll.
+- **A parcel stays `unknown` and the log says ORLEN Paczka cannot track it** — ORLEN's tracker refuses some numbers outright without saying whether the parcel exists. The parcel stays in the list so you can see it, and updates if ORLEN starts tracking it.
 - **An `AD…` code is rejected** — it is Allegro Delivery. Track it in Allegro rather than ORLEN Paczka.
 - **A status logs "Unrecognised ORLEN Paczka status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-orlen-paczka/issues/new) with the logged line so the mapping can be extended.
 

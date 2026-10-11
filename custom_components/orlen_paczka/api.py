@@ -75,11 +75,13 @@ class ORLENPaczkaApiClient:
         if not isinstance(payload, dict):
             raise ORLENPaczkaApiError("unexpected body (not a JSON object)")
 
-        if payload.get("err") == 1003:
-            # Config flow rejects AD codes, but retain a defensively received
-            # 1003 as an unknown parcel rather than turning a whole refresh
-            # into a failure. The coordinator normalises and warns once.
-            return {"number": tracking_code, "_orlen_error": "1003"}
+        if payload.get("err") in (1003, 1004):
+            # 1003 is an Allegro Delivery code the config flow already
+            # rejects; 1004 is a code ORLEN's tracker refuses to track.
+            # Neither says the parcel does not exist, so retain it as unknown
+            # rather than turning a whole refresh into a failure. The
+            # coordinator normalises and warns once.
+            return {"number": tracking_code, "_orlen_error": str(payload["err"])}
         if payload.get("status") == "" and not payload.get("history"):
             return None
         if payload.get("status") != "OK" or not isinstance(payload.get("history"), list):

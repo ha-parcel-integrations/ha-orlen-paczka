@@ -55,6 +55,22 @@ def test_690_uses_the_full_label_and_never_means_delivered(caplog):
     assert "issues/new" in caplog.text
 
 
+def test_690_handoff_to_a_carrier_abroad_stays_in_transit_despite_the_pickup_category():
+    sentence = (
+        "Paczka przekazana do przewoźnika w innym kraju. "
+        "Dalszą drogę możesz śledzić w aplikacji Vinted"
+    )
+    assert map_parcel_status("690", sentence) is ParcelStatus.IN_TRANSIT
+    assert map_event_status("690", sentence) is ParcelStatus.IN_TRANSIT
+    sample = active_sample()
+    sample["history"].append(
+        event("690", "15-06-2026, 02:00", sentence, "Paczka do odbioru")
+    )
+    parcel = normalize_parcel(sample)
+    assert parcel["status"] is ParcelStatus.IN_TRANSIT
+    assert parcel["pickup"] is False
+
+
 def test_unknown_status_warns_once_and_event_mapping_keeps_none(caplog):
     assert map_parcel_status("999", "Unexpected") is ParcelStatus.UNKNOWN
     assert map_parcel_status("999", "Unexpected") is ParcelStatus.UNKNOWN
@@ -110,6 +126,16 @@ def test_normalize_active_pickup_and_ambiguous_690():
     assert pickup["pickup"] is True
     ambiguous = normalize_parcel(ambiguous_690_sample())
     assert ambiguous["status"] is ParcelStatus.IN_TRANSIT
+
+
+def test_untrackable_code_is_kept_as_unknown_with_a_single_warning(caplog):
+    parcel = normalize_parcel({"number": ACTIVE_CODE, "_orlen_error": "1004"})
+    normalize_parcel({"number": ACTIVE_CODE, "_orlen_error": "1004"})
+    assert parcel["barcode"] == ACTIVE_CODE
+    assert parcel["status"] is ParcelStatus.UNKNOWN
+    assert caplog.text.count("err=1004") == 1
+    assert "issues/new" in caplog.text
+    assert "unexpected top-level keys" not in caplog.text
 
 
 def test_normalize_pending_placeholder_and_number_fallback():

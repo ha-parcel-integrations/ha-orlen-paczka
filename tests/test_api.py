@@ -49,6 +49,14 @@ async def test_get_parcel_marks_unsupported_allegro_response_for_safe_retention(
     }
 
 
+async def test_get_parcel_marks_untrackable_response_for_safe_retention():
+    client = ORLENPaczkaApiClient(_session_returning(200, _jsonp({"err": 1004})))
+    assert await client.async_get_parcel(ACTIVE_CODE) == {
+        "number": ACTIVE_CODE,
+        "_orlen_error": "1004",
+    }
+
+
 @pytest.mark.parametrize("body", ["not jsonp", "other({});", "callback(not-json);", "callback([]);"])
 async def test_get_parcel_rejects_malformed_or_non_object_jsonp(body):
     client = ORLENPaczkaApiClient(_session_returning(200, body))
