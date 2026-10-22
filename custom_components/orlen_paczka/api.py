@@ -50,7 +50,7 @@ class ORLENPaczkaApiClient:
         async with self._session.get(
             TRACKING_API_URL,
             params={"id": tracking_code, "jsonp": "callback"},
-            timeout=20,
+            timeout=aiohttp.ClientTimeout(total=20),
         ) as response:
             if response.status == 429:
                 retry_after_header = response.headers.get("Retry-After")

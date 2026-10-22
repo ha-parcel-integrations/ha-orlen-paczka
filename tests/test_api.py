@@ -36,7 +36,7 @@ async def test_get_parcel_returns_populated_jsonp_body():
         "id": ACTIVE_CODE,
         "jsonp": "callback",
     }
-    assert session.get.call_args.kwargs["timeout"] == 20
+    assert session.get.call_args.kwargs["timeout"] == aiohttp.ClientTimeout(total=20)
 
 
 @pytest.mark.parametrize(

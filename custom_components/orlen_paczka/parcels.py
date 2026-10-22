@@ -240,7 +240,9 @@ def normalize_parcel(raw: dict, *, include_history: bool = False) -> dict:
     it is display markup that disagreed with the structured history in a live
     response and must not end up in public diagnostics.
     """
-    history = raw.get("history") if isinstance(raw.get("history"), list) else []
+    history = raw.get("history")
+    if not isinstance(history, list):
+        history = []
     latest = history[-1] if history and isinstance(history[-1], dict) else {}
     tracking_code = raw.get("truckNo") or raw.get("number")
     status_code = latest.get("code")
