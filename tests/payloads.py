@@ -1,4 +1,5 @@
 """Sanitized ORLEN Paczka responses captured from the public tracker."""
+
 from __future__ import annotations
 
 ACTIVE_CODE = "2100000000001"
@@ -22,9 +23,15 @@ def delivered_sample(code: str = DELIVERED_CODE) -> dict:
         event("1000", "04-07-2026, 16:13", "Collected by customer"),
     ]
     return {
-        "status": "OK", "number": code, "full": True, "history": history,
-        "label": history[-1]["label"], "return": False, "truckNo": code,
-        "returnTruck": "Brak danych", "historyHtml": "<table>ignored</table>",
+        "status": "OK",
+        "number": code,
+        "full": True,
+        "history": history,
+        "label": history[-1]["label"],
+        "return": False,
+        "truckNo": code,
+        "returnTruck": "Brak danych",
+        "historyHtml": "<table>ignored</table>",
     }
 
 
@@ -50,7 +57,9 @@ def ambiguous_690_sample(code: str = ACTIVE_CODE) -> dict:
     """A real observed 690 conflict: full and short labels disagree."""
     sample = active_sample(code)
     sample["history"].append(
-        event("690", "15-06-2026, 02:00", "Paczka w innym kraju", "Ready for collection")
+        event(
+            "690", "15-06-2026, 02:00", "Paczka w innym kraju", "Ready for collection"
+        )
     )
     sample["label"] = sample["history"][-1]["label"]
     return sample

@@ -1,4 +1,5 @@
 """Tests for the ORLEN Paczka refresh button."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 from custom_components.orlen_paczka.button import ORLENPaczkaRefreshButton

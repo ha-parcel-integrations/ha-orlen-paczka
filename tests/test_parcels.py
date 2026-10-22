@@ -1,5 +1,6 @@
 """Tests for ORLEN's payload normalisation and status safeguards."""
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -33,9 +34,23 @@ from .payloads import (
 )
 
 CANONICAL_KEYS = [
-    "carrier", "barcode", "sender", "receiver", "status", "raw_status",
-    "delivered", "delivered_at", "planned_from", "planned_to", "pickup",
-    "pickup_point", "url", "weight", "dimensions", "history", "raw",
+    "carrier",
+    "barcode",
+    "sender",
+    "receiver",
+    "status",
+    "raw_status",
+    "delivered",
+    "delivered_at",
+    "planned_from",
+    "planned_to",
+    "pickup",
+    "pickup_point",
+    "url",
+    "weight",
+    "dimensions",
+    "history",
+    "raw",
 ]
 
 
@@ -49,7 +64,10 @@ def test_known_statuses_map_to_the_canonical_contract():
 
 
 def test_690_uses_the_full_label_and_never_means_delivered(caplog):
-    assert map_parcel_status("690", "Paczka czeka na odbiór w punkcie") is ParcelStatus.AT_PICKUP_POINT
+    assert (
+        map_parcel_status("690", "Paczka czeka na odbiór w punkcie")
+        is ParcelStatus.AT_PICKUP_POINT
+    )
     assert map_parcel_status("690", "Paczka w innym kraju") is ParcelStatus.IN_TRANSIT
     assert map_parcel_status("690", "Unexpected 690 label") is ParcelStatus.UNKNOWN
     assert "issues/new" in caplog.text
@@ -114,7 +132,18 @@ def test_normalize_maps_completed_pickup_and_omits_html_from_raw():
     assert parcel["url"] is None
     assert parcel["history"][-1]["status"] is ParcelStatus.DELIVERED
     assert "historyHtml" not in parcel["raw"]
-    assert all(parcel[key] is None for key in ("sender", "receiver", "planned_from", "planned_to", "pickup_point", "weight", "dimensions"))
+    assert all(
+        parcel[key] is None
+        for key in (
+            "sender",
+            "receiver",
+            "planned_from",
+            "planned_to",
+            "pickup_point",
+            "weight",
+            "dimensions",
+        )
+    )
 
 
 def test_normalize_active_pickup_and_ambiguous_690():
@@ -146,9 +175,12 @@ def test_normalize_pending_placeholder_and_number_fallback():
 
 
 def test_capabilities_match_confirmed_payload():
-    assert CAPABILITIES == {"history"}
+    assert {"history"} == CAPABILITIES
     assert CAPABILITIES <= KNOWN_CAPABILITIES
-    assert normalize_parcel(delivered_sample(), include_history=True)["history"] is not None
+    assert (
+        normalize_parcel(delivered_sample(), include_history=True)["history"]
+        is not None
+    )
 
 
 def test_sorting_and_delivered_retention():
@@ -157,15 +189,25 @@ def test_sorting_and_delivered_retention():
         {"barcode": "b", "planned_from": None},
         {"barcode": "c", "planned_from": "2026-07-01T10:00:00+02:00"},
     ]
-    assert [p["barcode"] for p in sort_parcels_by_ts(parcels, "planned_from")] == ["c", "a", "b"]
+    assert [p["barcode"] for p in sort_parcels_by_ts(parcels, "planned_from")] == [
+        "c",
+        "a",
+        "b",
+    ]
     entry = MockConfigEntry(
         domain=DOMAIN,
-        options={CONF_DELIVERED_FILTER_TYPE: "parcels", CONF_DELIVERED_FILTER_AMOUNT: 1},
+        options={
+            CONF_DELIVERED_FILTER_TYPE: "parcels",
+            CONF_DELIVERED_FILTER_AMOUNT: 1,
+        },
     )
     assert len(apply_delivered_filter([{"barcode": "a"}, {"barcode": "b"}], entry)) == 1
-    old = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    old = (datetime.now(UTC) - timedelta(days=30)).isoformat()
     days_entry = MockConfigEntry(
         domain=DOMAIN,
         options={CONF_DELIVERED_FILTER_TYPE: "days", CONF_DELIVERED_FILTER_AMOUNT: 1},
     )
-    assert apply_delivered_filter([{"barcode": "old", "delivered_at": old}], days_entry) == []
+    assert (
+        apply_delivered_filter([{"barcode": "old", "delivered_at": old}], days_entry)
+        == []
+    )

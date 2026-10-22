@@ -1,4 +1,5 @@
 """ORLEN Paczka's public JSONP tracking client."""
+
 from __future__ import annotations
 
 import json
@@ -54,7 +55,9 @@ class ORLENPaczkaApiClient:
             if response.status == 429:
                 retry_after_header = response.headers.get("Retry-After")
                 try:
-                    retry_after = float(retry_after_header) if retry_after_header else None
+                    retry_after = (
+                        float(retry_after_header) if retry_after_header else None
+                    )
                 except ValueError:
                     retry_after = None  # an HTTP-date, not seconds; let the caller's own backoff handle it
                 raise ORLENPaczkaApiError(
@@ -84,6 +87,8 @@ class ORLENPaczkaApiClient:
             return {"number": tracking_code, "_orlen_error": str(payload["err"])}
         if payload.get("status") == "" and not payload.get("history"):
             return None
-        if payload.get("status") != "OK" or not isinstance(payload.get("history"), list):
+        if payload.get("status") != "OK" or not isinstance(
+            payload.get("history"), list
+        ):
             raise ORLENPaczkaApiError("unexpected response envelope")
         return payload

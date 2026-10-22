@@ -1,4 +1,5 @@
 """Tests for the ORLEN Paczka JSONP API client."""
+
 import json
 from unittest.mock import AsyncMock, MagicMock
 
@@ -31,11 +32,16 @@ async def test_get_parcel_returns_populated_jsonp_body():
     session = _session_returning(200, _jsonp(active_sample()))
     parcel = await ORLENPaczkaApiClient(session).async_get_parcel(ACTIVE_CODE)
     assert parcel["number"] == ACTIVE_CODE
-    assert session.get.call_args.kwargs["params"] == {"id": ACTIVE_CODE, "jsonp": "callback"}
+    assert session.get.call_args.kwargs["params"] == {
+        "id": ACTIVE_CODE,
+        "jsonp": "callback",
+    }
     assert session.get.call_args.kwargs["timeout"] == 20
 
 
-@pytest.mark.parametrize("payload", [{"status": "", "history": [], "truckNo": "Brak danych"}])
+@pytest.mark.parametrize(
+    "payload", [{"status": "", "history": [], "truckNo": "Brak danych"}]
+)
 async def test_get_parcel_returns_none_for_semantic_no_data(payload):
     client = ORLENPaczkaApiClient(_session_returning(200, _jsonp(payload)))
     assert await client.async_get_parcel(ACTIVE_CODE) is None
@@ -57,7 +63,9 @@ async def test_get_parcel_marks_untrackable_response_for_safe_retention():
     }
 
 
-@pytest.mark.parametrize("body", ["not jsonp", "other({});", "callback(not-json);", "callback([]);"])
+@pytest.mark.parametrize(
+    "body", ["not jsonp", "other({});", "callback(not-json);", "callback([]);"]
+)
 async def test_get_parcel_rejects_malformed_or_non_object_jsonp(body):
     client = ORLENPaczkaApiClient(_session_returning(200, body))
     with pytest.raises(ORLENPaczkaApiError):

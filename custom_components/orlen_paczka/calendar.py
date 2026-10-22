@@ -1,4 +1,5 @@
 """Calendar platform for the ORLEN Paczka parcel tracker integration."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -20,17 +21,20 @@ PARALLEL_UPDATES = 0
 _DEFAULT_EVENT_DURATION = timedelta(hours=1)
 
 
-
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ORLENPaczkaConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the ORLEN Paczka deliveries calendar from a config entry."""
-    async_add_entities([ORLENPaczkaDeliveriesCalendar(entry.runtime_data.coordinator, entry)])
+    async_add_entities(
+        [ORLENPaczkaDeliveriesCalendar(entry.runtime_data.coordinator, entry)]
+    )
 
 
-class ORLENPaczkaDeliveriesCalendar(CoordinatorEntity[ORLENPaczkaCoordinator], CalendarEntity):
+class ORLENPaczkaDeliveriesCalendar(
+    CoordinatorEntity[ORLENPaczkaCoordinator], CalendarEntity
+):
     """A read-only calendar of expected ORLEN Paczka deliveries.
 
     Each active tracked parcel with a known delivery moment becomes an event.
@@ -60,7 +64,9 @@ class ORLENPaczkaDeliveriesCalendar(CoordinatorEntity[ORLENPaczkaCoordinator], C
 
             barcode = parcel.get("barcode") or ""
             sender = parcel.get("sender")
-            summary = sender or (f"Parcel {barcode}" if barcode else "ORLEN Paczka parcel")
+            summary = sender or (
+                f"Parcel {barcode}" if barcode else "ORLEN Paczka parcel"
+            )
             description_parts = [
                 f"Barcode: {barcode}" if barcode else None,
                 f"Status: {parcel.get('status')}" if parcel.get("status") else None,

@@ -1,4 +1,5 @@
 """Tests for ORLEN Paczka diagnostics."""
+
 from datetime import timedelta
 from unittest.mock import MagicMock
 

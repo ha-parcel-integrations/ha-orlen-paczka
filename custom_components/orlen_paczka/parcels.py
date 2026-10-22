@@ -10,10 +10,11 @@ The status map and normaliser below are the ORLEN-specific pieces. Everything
 else — history ordering, sorting, retention and one-shot warnings — is shared
 suite machinery.
 """
+
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
 import logging
-from datetime import datetime, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -70,6 +71,7 @@ def _warn_shape_once(key: str, message: str, *args: Any) -> None:
         return
     _shape_warnings_logged.add(key)
     _LOGGER.warning(message, *args)
+
 
 # Status codes we have already warned about, so each unmapped one is logged
 # only once per HA session instead of on every poll.
@@ -143,11 +145,11 @@ def parse_iso(value: str | None) -> datetime | None:
     if not value:
         return None
     try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(str(value))
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return parsed
 
 
@@ -156,9 +158,11 @@ def to_iso_timestamp(value: Any) -> str | None:
     if not isinstance(value, str):
         return None
     try:
-        return datetime.strptime(value.strip(), "%d-%m-%Y, %H:%M").replace(
-            tzinfo=CARRIER_TZ
-        ).isoformat()
+        return (
+            datetime.strptime(value.strip(), "%d-%m-%Y, %H:%M")
+            .replace(tzinfo=CARRIER_TZ)
+            .isoformat()
+        )
     except ValueError:
         _warn_shape_once(
             "timestamp",
@@ -214,7 +218,9 @@ def build_history(
         entry = {
             "timestamp": timestamp,
             "status": map_event_status(event.get("code"), event.get("label")),
-            "raw_status": event.get("label") or event.get("labelShort") or event.get("code"),
+            "raw_status": event.get("label")
+            or event.get("labelShort")
+            or event.get("code"),
         }
         parsed = parse_iso(timestamp)
         if parsed is None:
@@ -271,8 +277,17 @@ def normalize_parcel(raw: dict, *, include_history: bool = False) -> dict:
         )
 
     unknown_keys = set(raw) - {
-        "status", "number", "full", "history", "label", "return", "truckNo",
-        "returnTruck", "historyHtml", "err", "_orlen_error",
+        "status",
+        "number",
+        "full",
+        "history",
+        "label",
+        "return",
+        "truckNo",
+        "returnTruck",
+        "historyHtml",
+        "err",
+        "_orlen_error",
     }
     if unknown_keys:
         _warn_shape_once(
@@ -284,7 +299,8 @@ def normalize_parcel(raw: dict, *, include_history: bool = False) -> dict:
         )
     known_event_keys = {"date", "code", "label", "labelShort"}
     unknown_event_keys = sorted(
-        {key for event in history if isinstance(event, dict) for key in event} - known_event_keys
+        {key for event in history if isinstance(event, dict) for key in event}
+        - known_event_keys
     )
     if unknown_event_keys:
         _warn_shape_once(
@@ -348,14 +364,12 @@ def apply_delivered_filter(parcels: list[dict], entry: ConfigEntry) -> list[dict
     shows.
     """
     options = entry.options
-    filter_type = options.get(
-        CONF_DELIVERED_FILTER_TYPE, DEFAULT_DELIVERED_FILTER_TYPE
-    )
+    filter_type = options.get(CONF_DELIVERED_FILTER_TYPE, DEFAULT_DELIVERED_FILTER_TYPE)
     amount = int(
         options.get(CONF_DELIVERED_FILTER_AMOUNT, DEFAULT_DELIVERED_FILTER_AMOUNT)
     )
     if filter_type == "days":
-        cutoff = datetime.now(timezone.utc) - timedelta(days=amount)
+        cutoff = datetime.now(UTC) - timedelta(days=amount)
         return [
             parcel
             for parcel in parcels

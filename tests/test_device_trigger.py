@@ -1,4 +1,5 @@
 """Tests for ORLEN Paczka device triggers."""
+
 from custom_components.orlen_paczka.const import DOMAIN
 from custom_components.orlen_paczka.device_trigger import (
     TRIGGER_EVENTS,
