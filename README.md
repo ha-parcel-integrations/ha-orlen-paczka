@@ -115,6 +115,8 @@ Standard HA removal applies: **Settings → Devices & Services → ORLEN Paczka 
 | `sensor.orlen_paczka_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
 | `sensor.orlen_paczka_delivered_parcels` | Recently delivered parcels (see the retention option) |
 | `sensor.orlen_paczka_next_delivery` | Earliest expected delivery moment across all active parcels |
+| `sensor.orlen_paczka_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
+| `calendar.orlen_paczka_deliveries` | Read-only calendar of expected deliveries, no extra API calls |
 | `sensor.orlen_paczka_last_successful_update` | Diagnostic: when ORLEN Paczka was last polled successfully |
 
 A delivered parcel moves from its per-parcel sensor to the delivered sensor automatically.
@@ -177,7 +179,7 @@ logger:
 - **A parcel shows `unknown`** — ORLEN Paczka has not yet published data for the code, or it reported a status the integration has not mapped. It will update automatically on the next poll.
 - **A parcel stays `unknown` and the log says ORLEN Paczka cannot track it** — ORLEN's tracker refuses some numbers outright without saying whether the parcel exists. The parcel stays in the list so you can see it, and updates if ORLEN starts tracking it.
 - **An `AD…` code is rejected** — it is Allegro Delivery. Track it in Allegro rather than ORLEN Paczka.
-- **A status logs "Unrecognised ORLEN Paczka status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-orlen-paczka/issues/new) with the logged line so the mapping can be extended.
+- **A status logs "Unrecognised ORLEN Paczka status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-orlen-paczka/issues/new?template=unrecognised_status.yml) with the logged line so the mapping can be extended.
 
 ## Related integrations
 
