@@ -115,6 +115,7 @@ Standard HA removal applies: **Settings → Devices & Services → ORLEN Paczka 
 | `sensor.orlen_paczka_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
 | `sensor.orlen_paczka_delivered_parcels` | Recently delivered parcels (see the retention option) |
 | `sensor.orlen_paczka_next_delivery` | Earliest expected delivery moment across all active parcels |
+| `sensor.orlen_paczka_en_route_to_pickup_point` | Incoming parcels on their way to a pickup point that have not arrived yet |
 | `sensor.orlen_paczka_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `calendar.orlen_paczka_deliveries` | Read-only calendar of expected deliveries, no extra API calls |
 | `sensor.orlen_paczka_last_successful_update` | Diagnostic: when ORLEN Paczka was last polled successfully |

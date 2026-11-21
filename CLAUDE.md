@@ -66,6 +66,13 @@ endpoints or payload details into this public repository.
   `Europe/Warsaw`. ETA, structured pickup point, sender/receiver, weight,
   dimensions and URL are intentionally `None`; `CAPABILITIES` contains only
   opt-in history.
+- **`pickup` is the route, not the status.** It is true once any event of the
+  parcel mapped to `at_pickup_point` (code `690` with the waiting-for-collection
+  label) and stays true after collection (`1000`). `pickup_point` stays `None`:
+  ORLEN names no point. Both pickup sensors exist; `en_route_to_pickup_point`
+  reads 0 until a parcel is known to be bound for a point: the payload has no
+  destination field, so a real parcel has not yet shown it before arrival.
+- `planned_from`/`planned_to` are always `None`: no ETA in the payload.
 - **Allegro Delivery (`AD…` codes) is out of scope.** ORLEN's own tracking
   page refers those to Allegro; `config_flow.py` rejects an `AD`-prefixed
   code with a message pointing the user there rather than forwarding it to

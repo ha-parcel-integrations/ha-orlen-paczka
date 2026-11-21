@@ -128,7 +128,7 @@ def test_normalize_maps_completed_pickup_and_omits_html_from_raw():
     assert parcel["status"] is ParcelStatus.DELIVERED
     assert parcel["delivered"] is True
     assert parcel["delivered_at"] == "2026-07-04T16:13:00+02:00"
-    assert parcel["pickup"] is False
+    assert parcel["pickup"] is True
     assert parcel["url"] is None
     assert parcel["history"][-1]["status"] is ParcelStatus.DELIVERED
     assert "historyHtml" not in parcel["raw"]
