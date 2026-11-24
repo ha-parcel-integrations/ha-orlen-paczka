@@ -38,6 +38,7 @@ CANONICAL_KEYS = [
     "barcode",
     "sender",
     "receiver",
+    "contents",
     "status",
     "raw_status",
     "delivered",
@@ -137,6 +138,7 @@ def test_normalize_maps_completed_pickup_and_omits_html_from_raw():
         for key in (
             "sender",
             "receiver",
+            "contents",
             "planned_from",
             "planned_to",
             "pickup_point",
@@ -176,7 +178,8 @@ def test_normalize_pending_placeholder_and_number_fallback():
 
 def test_capabilities_match_confirmed_payload():
     assert {"history"} == CAPABILITIES
-    assert CAPABILITIES <= KNOWN_CAPABILITIES
+    assert KNOWN_CAPABILITIES - {"contents"} >= CAPABILITIES
+    assert "contents" in KNOWN_CAPABILITIES
     assert (
         normalize_parcel(delivered_sample(), include_history=True)["history"]
         is not None
