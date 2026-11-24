@@ -40,6 +40,9 @@ async def test_setup_and_unload(hass):
     assert incoming is not None
     assert incoming.state == "1"
 
+    # The Deliveries calendar is set up next to the sensors.
+    assert hass.states.get("calendar.orlen_paczka_deliveries") is not None
+
     # Services registered on setup...
     assert hass.services.has_service(DOMAIN, "track_parcel")
 
